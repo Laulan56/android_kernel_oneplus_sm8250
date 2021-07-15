@@ -1,0 +1,27 @@
+kind: pipeline
+name: MarisaKernel_Building
+
+platform:
+  os: linux
+  arch: amd64
+
+clone:
+  depth: 1
+
+steps:
+  - name: setup&build
+    image: ubuntu:latest
+    environment:
+      BOTTOKEN:
+        from_secret: bot_token
+      CHATID:
+        from_secret: chat_id
+    commands:
+      - export HOME=/drone
+      - apt update && apt-get install -y build-essential bc python curl git zip ftp gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi libssl-dev lftp zstd wget libfl-dev clang flex bison cpio
+      - git clone https://github.com/Laulan56/build-scripts/ /drone/build-tools/build-scripts --branch op_sm8250 --depth 1
+      - git clone https://github.com/kdrag0n/proton-clang.git /drone/proton-clang/ --depth 1
+      - chmod +x /drone/build-tools/build-scripts/setup.sh
+      - chmod +x /drone/build-tools/build-scripts/build.sh
+      - bash /drone/build-tools/build-scripts/setup.sh
+      - bash /drone/build-tools/build-scripts/build.sh
